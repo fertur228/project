@@ -30,4 +30,16 @@ public class UserService {
 
         userRepository.save(user);
     }
+
+    //Новый метод для логина
+    public User authenticateUser(String email, String rawPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+            throw new RuntimeException("Неверный пароль");
+        }
+
+        return user;
+    }
 }
