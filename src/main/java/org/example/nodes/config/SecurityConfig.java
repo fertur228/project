@@ -18,14 +18,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Отключаем CSRF
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/register").permitAll() // Разрешаем регистрацию
-                        .anyRequest().authenticated() // Все остальные запросы требуют авторизации
+                        .requestMatchers("/api/auth/**", "/api/login").permitAll() // 👈 Добавили сюда /api/login
+                        .anyRequest().authenticated()
                 )
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())); // Настроим CORS через CorsConfigurationSource
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()));
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
