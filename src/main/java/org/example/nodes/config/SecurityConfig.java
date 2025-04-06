@@ -20,13 +20,12 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/login").permitAll() // 👈 Добавили сюда /api/login
+                        .requestMatchers("/api/auth/**", "/api/login", "/api/posts/**", "/api/comments/**", "/api/comments/post/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));
         return http.build();
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -36,13 +35,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.addAllowedOrigin("http://localhost:3000"); // Разрешаем доступ с фронтенда
-        corsConfig.addAllowedMethod("*"); // Разрешаем все методы (GET, POST и т.д.)
-        corsConfig.addAllowedHeader("*"); // Разрешаем все заголовки
+        corsConfig.addAllowedOriginPattern("*"); // 👈 Позволяет доступ с любого Origin (Postman, фронт и т.д.)
+        corsConfig.addAllowedMethod("*");
+        corsConfig.addAllowedHeader("*");
+        corsConfig.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfig); // Разрешаем CORS для всех эндпоинтов
-
+        source.registerCorsConfiguration("/**", corsConfig);
         return source;
     }
 }
