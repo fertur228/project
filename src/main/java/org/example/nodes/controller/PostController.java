@@ -1,4 +1,4 @@
-package org.example.nodes.controller;
+
 
 import org.example.nodes.dto.PostCreateRequest;
 import org.example.nodes.dto.PostResponse;
@@ -27,5 +27,20 @@ public class PostController {
     @GetMapping
     public ResponseEntity<List<PostResponse>> getAllPosts() {
         return ResponseEntity.ok(postService.getAllPosts());
+    }
+
+    @PutMapping("/{postId}")
+    public ResponseEntity<String> updatePost(
+            @PathVariable Long postId,
+            @RequestBody PostCreateRequest request
+    ) {
+        postService.updatePost(postId, request);
+        return ResponseEntity.ok("Пост успешно обновлён");
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<String> deletePost(@PathVariable Long postId) {
+        postService.deletePost(postId);
+        return ResponseEntity.ok("Пост удалён");
     }
 }
