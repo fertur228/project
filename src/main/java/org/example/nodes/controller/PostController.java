@@ -42,4 +42,15 @@ public class PostController {
         postService.deletePost(postId);
         return ResponseEntity.ok("Пост успешно удален");
     }
+
+    // Новый эндпоинт для добавления лайка
+    @PutMapping("/{postId}/like")
+    public ResponseEntity<String> likePost(@PathVariable Long postId) {
+        try {
+            postService.incrementLikes(postId);  // Увеличиваем количество лайков
+            return ResponseEntity.ok("Лайк добавлен");  // Ответ с успешным сообщением
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body("Пост не найден");  // В случае ошибки (например, пост не найден)
+        }
+    }
 }
