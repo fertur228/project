@@ -20,8 +20,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/login", "/api/posts/**", "/api/comments/**", "/api/comments/post/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()  // Разрешаем все запросы без аутентификации
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));
         return http.build();
@@ -35,7 +34,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.addAllowedOriginPattern("*"); // 👈 Позволяет доступ с любого Origin (Postman, фронт и т.д.)
+        corsConfig.addAllowedOriginPattern("*"); // Разрешаем доступ с любого Origin (Postman, фронт и т.д.)
         corsConfig.addAllowedMethod("*");
         corsConfig.addAllowedHeader("*");
         corsConfig.setAllowCredentials(true);
