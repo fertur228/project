@@ -1,11 +1,16 @@
 package org.example.nodes.service;
 
+import org.example.nodes.dto.UserDTO;
 import org.example.nodes.dto.UserRegistrationRequest;
 import org.example.nodes.model.Role;
 import org.example.nodes.model.User;
 import org.example.nodes.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -48,7 +53,7 @@ public class UserService {
         return user;
     }
 
-    // Метод для изменения роли пользователя (без проверки на роль администратора)
+    // Метод для изменения роли пользователя
     public void changeUserRole(Long userId, Role newRole) {
         // Находим пользователя по ID
         User user = userRepository.findById(userId)
@@ -63,4 +68,15 @@ public class UserService {
         user.setRole(newRole);
         userRepository.save(user);
     }
+
+    // Метод для получения всех пользователей
+    public List<UserDTO> getAllUsers() {
+        List<User> users = userRepository.findAll(); // Получаем всех пользователей из репозитория
+        return users.stream()
+                .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getRole())) // Преобразуем в DTO
+                .collect(Collectors.toList());
+    }
+
+
+
 }
