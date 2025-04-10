@@ -73,4 +73,16 @@ public class PostService {
         // Удаляем пост из базы
         postRepository.delete(post);
     }
+
+    // Метод для увеличения количества лайков на 1
+    public void incrementLikes(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Пост не найден"));
+
+        // Увеличиваем количество лайков на 1
+        post.setLikesCount(post.getLikesCount() + 1);
+
+        // Сохраняем обновленный пост в базе
+        postRepository.save(post);
+    }
 }
