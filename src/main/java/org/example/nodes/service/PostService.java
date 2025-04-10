@@ -1,7 +1,6 @@
 package org.example.nodes.service;
 
 import org.example.nodes.dto.PostCreateRequest;
-import org.example.nodes.dto.PostCreateRequest;
 import org.example.nodes.dto.PostResponse;
 import org.example.nodes.model.Post;
 import org.example.nodes.model.User;
@@ -49,5 +48,29 @@ public class PostService {
                         post.getCommentsCount()
                 ))
                 .collect(Collectors.toList());
+    }
+
+    // Метод для обновления поста
+    public void updatePost(Long postId, PostCreateRequest request) {
+        // Получаем пост из базы
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Пост не найден"));
+
+        // Обновляем содержимое поста
+        post.setContent(request.getContent());
+        post.setCreatedAt(LocalDateTime.now()); // Можно обновить дату на текущее время
+
+        // Сохраняем обновлённый пост в базе
+        postRepository.save(post);
+    }
+
+    // Метод для удаления поста
+    public void deletePost(Long postId) {
+        // Проверка, существует ли пост
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Пост не найден"));
+
+        // Удаляем пост из базы
+        postRepository.delete(post);
     }
 }

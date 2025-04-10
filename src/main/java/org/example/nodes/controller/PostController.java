@@ -28,4 +28,18 @@ public class PostController {
     public ResponseEntity<List<PostResponse>> getAllPosts() {
         return ResponseEntity.ok(postService.getAllPosts());
     }
+
+    // Эндпоинт для редактирования поста
+    @PutMapping("/{postId}")
+    public ResponseEntity<String> updatePost(@PathVariable Long postId, @RequestBody PostCreateRequest request) {
+        postService.updatePost(postId, request);
+        return ResponseEntity.ok("Пост успешно обновлен");
+    }
+
+    // Эндпоинт для удаления поста
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<String> deletePost(@PathVariable Long postId) {
+        postService.deletePost(postId);
+        return ResponseEntity.ok("Пост успешно удален");
+    }
 }
