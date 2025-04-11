@@ -77,6 +77,13 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    // Метод для получения пользователя по ID
+    public Optional<UserDTO> getUserById(Long id) {
+        return userRepository.findById(id)
+                .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getRole()));
+    }
+
+
 
 
 }
