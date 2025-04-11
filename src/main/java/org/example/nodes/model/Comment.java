@@ -22,6 +22,7 @@ public class Comment {
     @Column(nullable = false)
     private String content;
 
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
