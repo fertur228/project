@@ -32,7 +32,7 @@ public class AuthController {
     public ResponseEntity<?> loginUser(@RequestBody UserLoginRequest request) {
         try {
             User user = userService.authenticateUser(request.getEmail(), request.getPassword());
-
+// hhgf
             // Можно вернуть только нужные поля
             return ResponseEntity.ok().body(Map.of(
                     "id", user.getId(),
