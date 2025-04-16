@@ -1,5 +1,8 @@
-HELP.md
-target/
+# Ignoring the target folder but allowing specific files to be tracked
+target/*
+!target/nodes-0.0.1-SNAPSHOT.jar
+
+# Maven wrapper files
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
