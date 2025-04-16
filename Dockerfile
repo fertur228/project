@@ -1,6 +1,11 @@
 # Используем официальный образ Java (например, OpenJDK 21)
 FROM openjdk:21-jdk-slim
 
+# Устанавливаем переменные окружения для базы данных
+ENV DATABASE_URL=postgresql://your-db-user:your-db-password@your-db-host:5432/your-db-name
+ENV DB_USER=your-db-user
+ENV DB_PASSWORD=your-db-password
+
 # Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
 
