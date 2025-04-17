@@ -22,7 +22,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()  // Разрешаем все запросы без аутентификации
                 )
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()));
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()));  // Подключаем CORS конфигурацию
         return http.build();
     }
 
@@ -34,8 +34,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.addAllowedOriginPattern("*"); // Разрешаем доступ с любого Origin (Postman, фронт и т.д.)
-        corsConfig.addAllowedMethod("*");
+        corsConfig.addAllowedOrigin("https://nodes-frontend.onrender.com"); // Указываем конкретный фронтенд
+        corsConfig.addAllowedMethod("GET");
+        corsConfig.addAllowedMethod("POST");
+        corsConfig.addAllowedMethod("PUT");
         corsConfig.addAllowedHeader("*");
         corsConfig.setAllowCredentials(true);
 
@@ -44,3 +46,4 @@ public class SecurityConfig {
         return source;
     }
 }
+
