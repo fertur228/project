@@ -34,10 +34,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.addAllowedOrigin("https://nodes-frontend.onrender.com"); // Указываем конкретный фронтенд
+        corsConfig.addAllowedOrigin("https://nodes-frontend.onrender.com"); // Уже существующий источник
+        corsConfig.addAllowedOrigin("http://localhost:3000"); // Добавляем разрешение для локального фронтенда
         corsConfig.addAllowedMethod("GET");
         corsConfig.addAllowedMethod("POST");
         corsConfig.addAllowedMethod("PUT");
+        corsConfig.addAllowedMethod("DELETE"); // Разрешаем DELETE запросы
         corsConfig.addAllowedHeader("*");
         corsConfig.setAllowCredentials(true);
 
@@ -46,4 +48,3 @@ public class SecurityConfig {
         return source;
     }
 }
-
