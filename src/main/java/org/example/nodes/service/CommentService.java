@@ -8,6 +8,7 @@ import org.example.nodes.model.User;
 import org.example.nodes.repository.CommentRepository;
 import org.example.nodes.repository.PostRepository;
 import org.example.nodes.repository.UserRepository;
+import org.example.nodes.utils.BadWordChecker;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,6 +28,11 @@ public class CommentService {
     }
 
     public Comment addComment(CommentRequest request) {
+        // Проверка на наличие плохих слов
+        if (BadWordChecker.containsBadWords(request.getContent())) {
+            throw new RuntimeException("Комментарий содержит неприемлемые слова");
+        }
+
         Post post = postRepository.findById(request.getPostId())
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         User user = userRepository.findById(request.getUserId())
@@ -49,10 +55,14 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
 
+        // Проверка на наличие плохих слов при обновлении
+        if (BadWordChecker.containsBadWords(request.getContent())) {
+            throw new RuntimeException("Комментарий содержит неприемлемые слова");
+        }
+
         comment.setContent(request.getContent());
         return commentRepository.save(comment);
     }
-
 
     public void deleteComment(Long commentId) {
         commentRepository.deleteById(commentId);
