@@ -87,4 +87,22 @@ public class PostService {
         // Сохраняем обновленный пост в базе
         postRepository.save(post);
     }
+    public List<PostResponse> searchPosts(String query) {
+        return postRepository.findAll().stream()
+                .filter(post ->
+                        post.getContent().toLowerCase().contains(query.toLowerCase()) ||
+                                post.getAuthor().getName().toLowerCase().contains(query.toLowerCase())
+                )
+                .map(post -> new PostResponse(
+                        post.getPostId(),
+                        post.getAuthor().getId(),
+                        post.getAuthor().getName(),
+                        post.getContent(),
+                        post.getCreatedAt(),
+                        post.getLikesCount(),
+                        post.getCommentsCount()
+                ))
+                .collect(Collectors.toList());
+    }
+
 }
