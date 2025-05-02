@@ -41,6 +41,7 @@ public class PostService {
         return postRepository.findAll().stream()
                 .map(post -> new PostResponse(
                         post.getPostId(),
+                        post.getAuthor().getId(),
                         post.getAuthor().getName(),
                         post.getContent(),
                         post.getCreatedAt(),
@@ -49,6 +50,7 @@ public class PostService {
                 ))
                 .collect(Collectors.toList());
     }
+
 
     // Метод для обновления поста
     public void updatePost(Long postId, PostCreateRequest request) {
