@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "users")
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,9 +20,12 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;  // 👈 Добавлено поле роль
+    private Role role;
 
-    // Геттеры и сеттеры
+    @Column(name = "avatar_path")
+    private String avatarPath; // путь к файлу
+
+    // геттеры и сеттеры
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -38,4 +40,7 @@ public class User {
 
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+
+    public String getAvatarPath() { return avatarPath; }
+    public void setAvatarPath(String avatarPath) { this.avatarPath = avatarPath; }
 }
