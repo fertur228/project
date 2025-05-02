@@ -125,4 +125,12 @@ public class UserService {
                 user.getAvatarPath()
         );
     }
+    public List<UserDTO> searchUsers(String query) {
+        return userRepository.findAll().stream()
+                .filter(user -> user.getName().toLowerCase().contains(query.toLowerCase())
+                        || user.getEmail().toLowerCase().contains(query.toLowerCase()))
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
 }
