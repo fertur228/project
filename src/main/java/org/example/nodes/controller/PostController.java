@@ -53,4 +53,9 @@ public class PostController {
             return ResponseEntity.status(404).body("Пост не найден");  // В случае ошибки (например, пост не найден)
         }
     }
+    @GetMapping("/search")
+    public ResponseEntity<List<PostResponse>> searchPosts(@RequestParam("query") String query) {
+        return ResponseEntity.ok(postService.searchPosts(query));
+    }
+
 }
