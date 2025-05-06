@@ -1,13 +1,24 @@
 package org.example.nodes.utils;
 
+import org.example.nodes.model.BannedWord;
+import org.example.nodes.service.BannedWordService;
+import org.springframework.stereotype.Component;
+
 import java.util.List;
 
+@Component
 public class BadWordChecker {
-    private static final List<String> BAD_WORDS = List.of("ерасыл", "плохое_слово2", "нецензурное_слово");
 
-    public static boolean containsBadWords(String content) {
-        for (String badWord : BAD_WORDS) {
-            if (content.toLowerCase().contains(badWord)) {
+    private final BannedWordService bannedWordService;
+
+    public BadWordChecker(BannedWordService bannedWordService) {
+        this.bannedWordService = bannedWordService;
+    }
+
+    public boolean containsBadWords(String content) {
+        List<BannedWord> bannedWords = bannedWordService.getActiveBannedWords();
+        for (BannedWord word : bannedWords) {
+            if (content.toLowerCase().contains(word.getWord().toLowerCase())) {
                 return true;
             }
         }
