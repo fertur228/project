@@ -8,7 +8,7 @@ import org.example.nodes.model.User;
 import org.example.nodes.repository.CommentRepository;
 import org.example.nodes.repository.PostRepository;
 import org.example.nodes.repository.UserRepository;
-import org.example.nodes.utils.BadWordChecker;
+import org.example.nodes.utils.BadWordChecker; // Убедитесь, что импорт правильный
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,16 +20,20 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final BadWordChecker badWordChecker;  // Внедрение зависимости
 
-    public CommentService(CommentRepository commentRepository, PostRepository postRepository, UserRepository userRepository) {
+    // Конструктор с внедрением BadWordChecker
+    public CommentService(CommentRepository commentRepository, PostRepository postRepository,
+                          UserRepository userRepository, BadWordChecker badWordChecker) {
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.badWordChecker = badWordChecker;  // Инициализация
     }
 
     public Comment addComment(CommentRequest request) {
-        // Проверка на наличие плохих слов
-        if (BadWordChecker.containsBadWords(request.getContent())) {
+        // Проверка на наличие плохих слов с использованием экземпляра BadWordChecker
+        if (badWordChecker.containsBadWords(request.getContent())) {
             throw new RuntimeException("Комментарий содержит неприемлемые слова");
         }
 
@@ -55,8 +59,8 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
 
-        // Проверка на наличие плохих слов при обновлении
-        if (BadWordChecker.containsBadWords(request.getContent())) {
+        // Проверка на наличие плохих слов при обновлении с использованием экземпляра BadWordChecker
+        if (badWordChecker.containsBadWords(request.getContent())) {
             throw new RuntimeException("Комментарий содержит неприемлемые слова");
         }
 

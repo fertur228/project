@@ -6,6 +6,7 @@ import org.example.nodes.model.Post;
 import org.example.nodes.model.User;
 import org.example.nodes.repository.PostRepository;
 import org.example.nodes.repository.UserRepository;
+import org.example.nodes.utils.BadWordChecker; // Импортируем BadWordChecker
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,13 +18,22 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final BadWordChecker badWordChecker; // Внедряем зависимость
 
-    public PostService(PostRepository postRepository, UserRepository userRepository) {
+    // Конструктор с внедрением BadWordChecker
+    public PostService(PostRepository postRepository, UserRepository userRepository, BadWordChecker badWordChecker) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.badWordChecker = badWordChecker; // Инициализация
     }
 
+    // Метод для создания поста
     public void createPost(PostCreateRequest request) {
+        // Проверка на наличие запрещённых слов
+        if (badWordChecker.containsBadWords(request.getContent())) {
+            throw new RuntimeException("Пост содержит запрещённые слова");
+        }
+
         User author = userRepository.findById(request.getAuthorId())
                 .orElseThrow(() -> new RuntimeException("Автор не найден"));
 
@@ -37,6 +47,7 @@ public class PostService {
         postRepository.save(post);
     }
 
+    // Метод для получения всех постов
     public List<PostResponse> getAllPosts() {
         return postRepository.findAll().stream()
                 .map(post -> new PostResponse(
@@ -51,9 +62,13 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-
     // Метод для обновления поста
     public void updatePost(Long postId, PostCreateRequest request) {
+        // Проверка на наличие запрещённых слов
+        if (badWordChecker.containsBadWords(request.getContent())) {
+            throw new RuntimeException("Пост содержит запрещённые слова");
+        }
+
         // Получаем пост из базы
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Пост не найден"));
@@ -87,6 +102,8 @@ public class PostService {
         // Сохраняем обновленный пост в базе
         postRepository.save(post);
     }
+
+    // Метод для поиска постов по запросу
     public List<PostResponse> searchPosts(String query) {
         return postRepository.findAll().stream()
                 .filter(post ->
@@ -104,5 +121,4 @@ public class PostService {
                 ))
                 .collect(Collectors.toList());
     }
-
 }
