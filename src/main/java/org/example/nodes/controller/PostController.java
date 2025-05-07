@@ -3,8 +3,10 @@ package org.example.nodes.controller;
 import org.example.nodes.dto.PostCreateRequest;
 import org.example.nodes.dto.PostResponse;
 import org.example.nodes.service.PostService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -18,29 +20,54 @@ public class PostController {
         this.postService = postService;
     }
 
-    /* ---------- CRUD ---------- */
+    /* ──────────────── CREATE ──────────────── */
 
-    @PostMapping
-    public ResponseEntity<String> createPost(@RequestBody PostCreateRequest request) {
+    /** Старый JSON‑вариант (без медиа) — оставили для обратной совместимости. */
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> createPostJson(@RequestBody PostCreateRequest request) {
         postService.createPost(request);
-        return ResponseEntity.ok("Пост успешно создан");
+        return ResponseEntity.ok("Пост успешно создан (без медиа)");
     }
 
-    /**
-     * Получить ленту постов с флагом likedByCurrentUser.
-     * Пример:  GET /api/posts?userId=42
+    /** Новый вариант: multipart/form‑data (текст + файл). */
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> createPostMultipart(@RequestParam Long authorId,
+                                                      @RequestParam String content,
+                                                      @RequestPart(required = false) MultipartFile file) {
+        postService.createPost(authorId, content, file);
+        return ResponseEntity.ok("Пост успешно создан (media=" + (file != null) + ")");
+    }
+
+    /* ──────────────── READ ──────────────── */
+
+    /** Получить ленту постов с флагом likedByCurrentUser.
+     *  Пример:  GET /api/posts?userId=42
      */
     @GetMapping
     public ResponseEntity<List<PostResponse>> getAllPosts(@RequestParam Long userId) {
         return ResponseEntity.ok(postService.getAllPostsForUser(userId));
     }
 
-    @PutMapping("/{postId}")
-    public ResponseEntity<String> updatePost(@PathVariable Long postId,
-                                             @RequestBody PostCreateRequest request) {
+    /* ──────────────── UPDATE ──────────────── */
+
+    /** Обновление только текста (JSON). */
+    @PutMapping(value = "/{postId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> updatePostJson(@PathVariable Long postId,
+                                                 @RequestBody PostCreateRequest request) {
         postService.updatePost(postId, request);
-        return ResponseEntity.ok("Пост успешно обновлён");
+        return ResponseEntity.ok("Пост успешно обновлён (без изменения медиа)");
     }
+
+    /** Обновить текст и (при необходимости) заменить файл. */
+    @PutMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> updatePostMultipart(@PathVariable Long postId,
+                                                      @RequestParam String content,
+                                                      @RequestPart(required = false) MultipartFile file) {
+        postService.updatePost(postId, content, file);
+        return ResponseEntity.ok("Пост успешно обновлён (media=" + (file != null) + ")");
+    }
+
+    /* ──────────────── DELETE ──────────────── */
 
     @DeleteMapping("/{postId}")
     public ResponseEntity<String> deletePost(@PathVariable Long postId) {
@@ -48,7 +75,8 @@ public class PostController {
         return ResponseEntity.ok("Пост успешно удалён");
     }
 
-    /* ---------- лайк / дизлайк ---------- */
+    /* ──────────────── LIKE / UNLIKE ──────────────── */
+
     @PutMapping("/{postId}/like")
     public ResponseEntity<Integer> toggleLike(@PathVariable Long postId,
                                               @RequestParam Long userId) {
@@ -56,7 +84,8 @@ public class PostController {
         return ResponseEntity.ok(newCount);
     }
 
-    /* ---------- поиск ---------- */
+    /* ──────────────── SEARCH ──────────────── */
+
     @GetMapping("/search")
     public ResponseEntity<List<PostResponse>> searchPosts(@RequestParam String query,
                                                           @RequestParam Long userId) {

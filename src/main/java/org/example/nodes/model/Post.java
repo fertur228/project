@@ -20,6 +20,9 @@ public class Post {
     @Column(nullable = false)
     private String content;
 
+    /** Относительный путь к файлу типа /uploads/posts/uuid.jpg */
+    private String mediaPath;  // 🔴 НОВОЕ
+
     @Column(name = "date", nullable = false)
     private LocalDateTime createdAt;
 
@@ -58,4 +61,8 @@ public class Post {
 
     /* пересчитать кэш лайков */
     public void recalcLikes()              { this.likesCount = likedBy.size(); }
+
+    // Новые методы для mediaPath
+    public String getMediaPath()              { return mediaPath; }
+    public void setMediaPath(String mediaPath){ this.mediaPath = mediaPath; }
 }
