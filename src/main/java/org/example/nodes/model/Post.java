@@ -2,6 +2,8 @@ package org.example.nodes.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "posts")
@@ -18,28 +20,42 @@ public class Post {
     @Column(nullable = false)
     private String content;
 
-    @Column(name = "date", nullable = false) // 👈 Указываем реальное имя колонки в БД
+    @Column(name = "date", nullable = false)
     private LocalDateTime createdAt;
 
-    private int likesCount = 0;
+    /* ---------- лайки ---------- */
+    @ManyToMany
+    @JoinTable(name = "post_likes",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"),
+            uniqueConstraints = @UniqueConstraint(columnNames = {"post_id", "user_id"}))
+    private Set<User> likedBy = new HashSet<>();
+
+    private int likesCount = 0;      // кэш для быстрого вывода
     private int commentsCount = 0;
 
-    // Геттеры и сеттеры
-    public Long getPostId() { return postId; }
-    public void setPostId(Long postId) { this.postId = postId; }
+    /* ---------- геттеры/сеттеры ---------- */
+    public Long getPostId()                { return postId; }
+    public void setPostId(Long postId)     { this.postId = postId; }
 
-    public User getAuthor() { return author; }
-    public void setAuthor(User author) { this.author = author; }
+    public User getAuthor()                { return author; }
+    public void setAuthor(User author)     { this.author = author; }
 
-    public String getContent() { return content; }
+    public String getContent()             { return content; }
     public void setContent(String content) { this.content = content; }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getCreatedAt()    { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public int getLikesCount() { return likesCount; }
+    public int getLikesCount()             { return likesCount; }
     public void setLikesCount(int likesCount) { this.likesCount = likesCount; }
 
-    public int getCommentsCount() { return commentsCount; }
+    public int getCommentsCount()          { return commentsCount; }
     public void setCommentsCount(int commentsCount) { this.commentsCount = commentsCount; }
+
+    public Set<User> getLikedBy()          { return likedBy; }
+    public void setLikedBy(Set<User> likedBy) { this.likedBy = likedBy; }
+
+    /* пересчитать кэш лайков */
+    public void recalcLikes()              { this.likesCount = likedBy.size(); }
 }
