@@ -18,44 +18,48 @@ public class PostController {
         this.postService = postService;
     }
 
+    /* ---------- CRUD ---------- */
+
     @PostMapping
     public ResponseEntity<String> createPost(@RequestBody PostCreateRequest request) {
         postService.createPost(request);
         return ResponseEntity.ok("Пост успешно создан");
     }
 
+    /**
+     * Получить ленту постов с флагом likedByCurrentUser.
+     * Пример:  GET /api/posts?userId=42
+     */
     @GetMapping
-    public ResponseEntity<List<PostResponse>> getAllPosts() {
-        return ResponseEntity.ok(postService.getAllPosts());
+    public ResponseEntity<List<PostResponse>> getAllPosts(@RequestParam Long userId) {
+        return ResponseEntity.ok(postService.getAllPostsForUser(userId));
     }
 
-    // Эндпоинт для редактирования поста
     @PutMapping("/{postId}")
-    public ResponseEntity<String> updatePost(@PathVariable Long postId, @RequestBody PostCreateRequest request) {
+    public ResponseEntity<String> updatePost(@PathVariable Long postId,
+                                             @RequestBody PostCreateRequest request) {
         postService.updatePost(postId, request);
-        return ResponseEntity.ok("Пост успешно обновлен");
+        return ResponseEntity.ok("Пост успешно обновлён");
     }
 
-    // Эндпоинт для удаления поста
     @DeleteMapping("/{postId}")
     public ResponseEntity<String> deletePost(@PathVariable Long postId) {
         postService.deletePost(postId);
-        return ResponseEntity.ok("Пост успешно удален");
+        return ResponseEntity.ok("Пост успешно удалён");
     }
 
-    // Новый эндпоинт для добавления лайка
+    /* ---------- лайк / дизлайк ---------- */
     @PutMapping("/{postId}/like")
-    public ResponseEntity<String> likePost(@PathVariable Long postId) {
-        try {
-            postService.incrementLikes(postId);  // Увеличиваем количество лайков
-            return ResponseEntity.ok("Лайк добавлен");  // Ответ с успешным сообщением
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body("Пост не найден");  // В случае ошибки (например, пост не найден)
-        }
-    }
-    @GetMapping("/search")
-    public ResponseEntity<List<PostResponse>> searchPosts(@RequestParam("query") String query) {
-        return ResponseEntity.ok(postService.searchPosts(query));
+    public ResponseEntity<Integer> toggleLike(@PathVariable Long postId,
+                                              @RequestParam Long userId) {
+        int newCount = postService.toggleLike(postId, userId);
+        return ResponseEntity.ok(newCount);
     }
 
+    /* ---------- поиск ---------- */
+    @GetMapping("/search")
+    public ResponseEntity<List<PostResponse>> searchPosts(@RequestParam String query,
+                                                          @RequestParam Long userId) {
+        return ResponseEntity.ok(postService.searchPosts(query, userId));
+    }
 }
