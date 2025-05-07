@@ -25,6 +25,11 @@ public class User {
     @Column(name = "avatar_path")
     private String avatarPath; // путь к файлу
 
+    // 👇 добавьте поле bio
+    @Column(columnDefinition = "TEXT")   // длинный произвольный текст
+    private String bio;
+
+
     // геттеры и сеттеры
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -43,4 +48,8 @@ public class User {
 
     public String getAvatarPath() { return avatarPath; }
     public void setAvatarPath(String avatarPath) { this.avatarPath = avatarPath; }
+    // геттер/сеттер
+    public String getBio() { return bio; }
+    public void setBio(String bio) { this.bio = bio; }
+
 }
