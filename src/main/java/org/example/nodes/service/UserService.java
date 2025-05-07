@@ -122,7 +122,8 @@ public class UserService {
                 user.getName(),
                 user.getEmail(),
                 user.getRole(),
-                user.getAvatarPath()
+                user.getAvatarPath(),
+                user.getBio()
         );
     }
     public List<UserDTO> searchUsers(String query) {
@@ -132,5 +133,20 @@ public class UserService {
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
+
+    // PATCH‑обновление био
+    public UserDTO updateBio(Long userId, String newBio) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+        user.setBio(newBio == null ? "" : newBio.trim());
+        userRepository.save(user);
+        return mapToDTO(user);
+    }
+
+    public Optional<String> getBio(Long userId) {
+        return userRepository.findById(userId)
+                .map(User::getBio);   // map(...) → Optional<String>
+    }
+
 
 }
