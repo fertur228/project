@@ -4,6 +4,7 @@ import org.example.nodes.dto.PostCreateRequest;
 import org.example.nodes.dto.PostResponse;
 import org.example.nodes.model.Post;
 import org.example.nodes.model.User;
+import org.example.nodes.repository.CommentRepository;      // ← добавили
 import org.example.nodes.repository.PostRepository;
 import org.example.nodes.repository.UserRepository;
 import org.example.nodes.service.StorageService;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Сервис, отвечающий за CRUD‑операции с постами, файловое хранилище и лайки.
+ * Сервис, отвечающий за CRUD-операции с постами, файловое хранилище, лайки и удаление комментариев.
  */
 @Service
 public class PostService {
@@ -26,20 +27,23 @@ public class PostService {
     private final UserRepository userRepository;
     private final BadWordChecker badWordChecker;
     private final StorageService storageService;
+    private final CommentRepository commentRepository;   // ← новое поле
 
     public PostService(PostRepository postRepository,
                        UserRepository userRepository,
                        BadWordChecker badWordChecker,
-                       StorageService storageService) {
+                       StorageService storageService,
+                       CommentRepository commentRepository) {   // ← принимаем в конструкторе
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.badWordChecker = badWordChecker;
         this.storageService = storageService;
+        this.commentRepository = commentRepository;     // ← инициализируем
     }
 
     /* ──────────────── CREATE ──────────────── */
 
-    /** JSON‑вариант (без медиа) остаётся для совместимости с фронтом. */
+    /** JSON-вариант (без медиа) остаётся для совместимости с фронтом. */
     public void createPost(PostCreateRequest request) {
         createPost(request.getAuthorId(), request.getContent(), null);
     }
@@ -70,7 +74,7 @@ public class PostService {
 
     /* ──────────────── UPDATE ──────────────── */
 
-    /** JSON‑обновление без изменения файла. */
+    /** JSON-обновление без изменения файла. */
     public void updatePost(Long postId, PostCreateRequest request) {
         updatePost(postId, request.getContent(), null);
     }
@@ -82,7 +86,6 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Пост не найден"));
 
-        // если пришёл новый файл — удаляем старый и сохраняем новый
         if (file != null && !file.isEmpty()) {
             storageService.delete(post.getMediaPath());
             post.setMediaPath(storageService.store(file));
@@ -95,11 +98,21 @@ public class PostService {
 
     /* ──────────────── DELETE ──────────────── */
 
+    /**
+     * Сначала удаляем все комментарии к посту, затем файл и сам пост.
+     */
+    @Transactional
     public void deletePost(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Пост не найден"));
 
-        storageService.delete(post.getMediaPath());   // очищаем диск
+        // удаляем файл с диска (если есть)
+        storageService.delete(post.getMediaPath());
+
+        // удаляем все комментарии, связанные с этим постом
+        commentRepository.deleteByPost_PostId(postId);
+
+        // наконец — удаляем сам пост
         postRepository.delete(post);
     }
 
@@ -147,7 +160,7 @@ public class PostService {
                 post.getAuthor().getId(),
                 post.getAuthor().getName(),
                 post.getContent(),
-                post.getMediaPath(),          // URL к изображению/видео
+                post.getMediaPath(),
                 post.getCreatedAt(),
                 post.getLikesCount(),
                 post.getCommentsCount(),
