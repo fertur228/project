@@ -16,6 +16,8 @@ public class BadWordChecker {
     }
 
     public boolean containsBadWords(String content) {
+        if (content == null) return false; // avoid NullPointerException
+
         List<BannedWord> bannedWords = bannedWordService.getActiveBannedWords();
         for (BannedWord word : bannedWords) {
             if (content.toLowerCase().contains(word.getWord().toLowerCase())) {
